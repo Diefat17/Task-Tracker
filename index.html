@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Task Tracker</title>
+</head>
+
+<style>
+    *{
+        color-scheme: dark;
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+
+    h1{
+        text-align: center;
+    }
+
+    
+    
+    article{
+        display: flex;
+        justify-content: center;
+    }
+ 
+    section{
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+    }
+
+    label{
+        margin-top: 20px;
+        
+    }
+
+    input, #add{
+        padding-block: 10px;
+        padding-inline: 20px;
+        font-size: 16px;
+    }
+
+    #erase{
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+
+        &:hover{
+            scale: 1.2;
+        }
+    }
+
+    [type = 'text']{
+        width: 300px;
+    }
+
+    
+
+    [type='checkbox']:checked + span{
+        text-decoration:line-through;
+        color: gray;
+    }
+
+</style>
+
+<body>
+    <h1>Task Tracker</h1>
+
+    <article>
+        <form action="">
+            <label for="">
+                <input type="text" id="input" placeholder="Start writting and press enter to create a task">
+                <button id="add" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+            </label>
+            
+            <main id="list">
+            </main>
+        </form>
+    </article>
+
+</body>
+
+<script type="module">
+
+    let tareas = []
+    let ids = 0
+
+    const $ = (id) => document.getElementById(id)
+    const $$ = (className) => document.getElementsByClassName(className)
+
+    const $list = $('list')
+    const $add = $('add')
+    const $input = $('input')
+
+    let $$tasks = $$('checkbox')
+    let $$borrador
+
+    $add.onclick = (event) => {
+        event.preventDefault()
+        if($input.value == '')return
+
+        let temp = {desc: $input.value, status: false, id: ids}
+        tareas.push(temp)
+
+        $input.value = ''
+        ids++
+
+        renderTask()
+    }
+
+    function renderTask() {
+        let temp = []
+        $list.innerHTML = ''
+
+        tareas.forEach( el => {
+            if(el.status != true){
+                $list.innerHTML = $list.innerHTML + 
+                    `<section ide=${el.id}>
+                        <label>
+                            <input type="checkbox" class="checkbox" ide=${el.id}>
+                            <span>${el.desc}</span>
+                        </label>
+                        <button id="erase" type="button" class="borrador">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </section>
+                    `
+            }
+
+            else temp.push(el)  
+        })
+
+        temp.forEach( el => {
+            $list.innerHTML = $list.innerHTML + 
+            `<section ide=${el.id}>
+                <label>
+                    <input type="checkbox" class="checkbox"  ide=${el.id} checked>
+                    <span>${el.desc}</span>
+                </label>
+                <button id="erase" type="button" class="borrador">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+            </section>
+            `       
+        })
+        $$tasks = $$('checkbox')
+        $$borrador = $$('borrador')
+        for(let i = 0; i < $$tasks.length; i++)$$tasks[i].onclick = tareaHecha
+        for(let i = 0; i < $$borrador.length; i++)$$borrador[i].onclick = borrarTarea
+
+
+    }
+
+    function tareaHecha (event) {
+        let index = tareas.findIndex((x) => x.id == event.target.getAttribute('ide'))
+        tareas[index].status = !tareas[index].status
+        renderTask()
+    }
+
+    function borrarTarea (event) {
+        let index = tareas.findIndex((x) => x.id == event.target.parentNode.parentNode.getAttribute('ide'))
+        //console.log(tareas[event.target.parentNode.getAttribute('ide')])
+        tareas.splice(index, 1)
+        renderTask()
+    }
+
+
+
+</script>
+</html>
